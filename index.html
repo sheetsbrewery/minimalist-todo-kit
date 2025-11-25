@@ -1,0 +1,2294 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minimalist To-Do Template</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="logo.png" />
+
+    <style>
+      :root {
+        --mauve: #b980a0;
+        --rose: #c698a6;
+        --plum: #703e57;
+        --soft-ink: #2e2330;
+        --cloud: #f6f6f6;
+        --card: #ffffffee;
+        --border: #e7e1e6;
+        --shadow: 0 14px 40px rgba(112, 62, 87, 0.14);
+        --radius: 18px;
+        --transition: 220ms ease;
+        --nav-ease: cubic-bezier(0.2, 0.7, 0.25, 1.05);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+
+      body {
+        margin: 0;
+        font-family: "Poppins", system-ui, -apple-system, sans-serif;
+        color: var(--soft-ink);
+        background: linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.85),
+            rgba(245, 245, 245, 0.9)
+          ),
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23ffffff' stop-opacity='0.72'/%3E%3Cstop stop-color='%23ecebeb' stop-opacity='0.8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='240' height='240' fill='url(%23g)'/%3E%3Cpath d='M0 32c40 10 80-10 120 0s80 20 120 0v16c-40 20-80 0-120 0S40 68 0 80V32z' fill='none' stroke='%23d9d6d2' stroke-width='1.5' stroke-opacity='0.55'/%3E%3Cpath d='M0 140c38 18 82-8 120 0s74 22 120 0v20c-46 14-80-10-120 0s-80 26-120 0V140z' fill='none' stroke='%23dedad8' stroke-width='1.2' stroke-opacity='0.45'/%3E%3C/svg%3E");
+        background-size: cover, 540px;
+        min-height: 100vh;
+        padding: 36px 18px 72px;
+      }
+
+      @media (min-width: 1025px) {
+        body {
+          padding-left: 300px;
+        }
+
+        body.nav-collapsed {
+          padding-left: 180px;
+        }
+      }
+
+      .side-nav {
+        position: fixed;
+        top: 52px;
+        left: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        width: 260px;
+        padding: 18px;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(112, 62, 87, 0.14);
+        border-radius: 24px;
+        box-shadow: 0 22px 42px rgba(112, 62, 87, 0.18);
+        backdrop-filter: blur(14px);
+        z-index: 9;
+        transition: width 260ms ease, padding 260ms ease, box-shadow 260ms ease,
+          transform 260ms ease;
+        overflow: hidden;
+      }
+
+      .side-nav.collapsed {
+        width: 90px;
+        padding: 16px;
+        gap: 8px;
+        align-items: center;
+        box-shadow: 0 18px 32px rgba(112, 62, 87, 0.16);
+        background: rgba(255, 255, 255, 0.96);
+      }
+
+      .nav-toggle {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        border: 1px solid rgba(185, 128, 160, 0.28);
+        background: #fff;
+        color: var(--plum);
+        box-shadow: 0 10px 18px rgba(112, 62, 87, 0.12);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        transition: transform var(--transition), box-shadow var(--transition);
+      }
+
+      .nav-toggle:hover,
+      .nav-toggle:focus-visible {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 22px rgba(112, 62, 87, 0.16);
+        outline: none;
+      }
+
+      .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 18px;
+        background: linear-gradient(120deg, rgba(185, 128, 160, 0.16), #fff);
+        border: 1px solid rgba(185, 128, 160, 0.26);
+        box-shadow: 0 14px 32px rgba(112, 62, 87, 0.14);
+      }
+
+      .nav-emoji {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        background: #fff;
+        color: var(--plum);
+        font-weight: 800;
+        font-size: 16px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72),
+          0 12px 22px rgba(112, 62, 87, 0.16);
+      }
+
+      .nav-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .nav-eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #6c5b6f;
+      }
+
+      .nav-title {
+        font-weight: 700;
+        color: var(--plum);
+        letter-spacing: -0.01em;
+      }
+
+      .side-nav.collapsed .nav-meta {
+        display: none;
+      }
+
+      .side-nav.collapsed .nav-emoji {
+        width: 38px;
+        height: 38px;
+      }
+
+      .side-nav.collapsed .nav-brand {
+        justify-content: center;
+        padding: 10px;
+      }
+
+      .nav-divider {
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          rgba(112, 62, 87, 0.12),
+          rgba(112, 62, 87, 0.04)
+        );
+        transition: opacity var(--transition), height var(--transition);
+      }
+
+      .nav-links {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .nav-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        width: 100%;
+        border-radius: 16px;
+        background: #fff;
+        border: 1px solid rgba(185, 128, 160, 0.28);
+        box-shadow: 0 10px 18px rgba(112, 62, 87, 0.12);
+        color: #3a2d3c;
+        text-decoration: none;
+        isolation: isolate;
+        overflow: hidden;
+        will-change: transform, box-shadow, background;
+        transition: transform 360ms var(--nav-ease),
+          box-shadow 360ms var(--nav-ease), border-color 280ms var(--nav-ease),
+          background 280ms var(--nav-ease), filter 360ms var(--nav-ease);
+      }
+
+      .nav-item::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        background: linear-gradient(
+          120deg,
+          rgba(185, 128, 160, 0.16),
+          transparent 45%
+        );
+        opacity: 0;
+        transform: translateX(-20%);
+        transition: transform 520ms var(--nav-ease),
+          opacity 360ms var(--nav-ease);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .nav-item::after {
+        content: "";
+        position: absolute;
+        inset: 2px;
+        border-radius: inherit;
+        background: radial-gradient(
+          circle at var(--hover-x, 50%) var(--hover-y, 50%),
+          rgba(185, 128, 160, 0.18),
+          transparent 58%
+        );
+        opacity: 0;
+        transform: scale(0.96);
+        transition: opacity 320ms var(--nav-ease),
+          transform 420ms var(--nav-ease);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .nav-item > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .side-nav.collapsed .nav-item {
+        width: 56px;
+        height: 56px;
+        padding: 6px;
+        border-radius: 12px;
+        background: #fff;
+        border: 1px solid rgba(185, 128, 160, 0.28);
+        box-shadow: 0 10px 18px rgba(112, 62, 87, 0.12);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 0;
+        transition: transform 360ms var(--nav-ease),
+          box-shadow 360ms var(--nav-ease), border-color 280ms var(--nav-ease),
+          background 280ms var(--nav-ease);
+      }
+
+      .nav-item:hover,
+      .nav-item:focus-visible {
+        transform: translateX(4px) translateY(-1px);
+        border-color: rgba(185, 128, 160, 0.36);
+        box-shadow: 0 18px 34px rgba(112, 62, 87, 0.2);
+        outline: none;
+        background: #fff;
+        filter: saturate(1.02);
+      }
+
+      .nav-item:hover::before,
+      .nav-item:focus-visible::before {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .nav-item:hover::after,
+      .nav-item:focus-visible::after {
+        opacity: 1;
+        transform: scale(1.02);
+      }
+
+      .side-nav.collapsed .nav-item:hover,
+      .side-nav.collapsed .nav-item:focus-visible {
+        transform: translateY(-2px);
+      }
+
+      .nav-item:active {
+        transform: translateX(2px);
+        box-shadow: 0 12px 22px rgba(112, 62, 87, 0.16);
+      }
+
+      .nav-item.active {
+        background: linear-gradient(120deg, rgba(185, 128, 160, 0.08), #fff);
+        border-color: rgba(185, 128, 160, 0.34);
+        box-shadow: 0 20px 36px rgba(112, 62, 87, 0.22);
+      }
+
+      .nav-item.active::before,
+      .nav-item.active::after {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .nav-item,
+        .nav-item::before,
+        .nav-item::after {
+          transition: none;
+        }
+      }
+
+      .nav-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        border: 1px solid rgba(185, 128, 160, 0.28);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.02em;
+        color: var(--plum);
+        background: radial-gradient(
+            circle at 25% 25%,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0.7)
+          ),
+          linear-gradient(135deg, rgba(185, 128, 160, 0.25), #f8f3f6);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8),
+          0 10px 18px rgba(112, 62, 87, 0.16);
+      }
+
+      .side-nav.collapsed .nav-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 13px;
+        border-radius: 12px;
+        background: linear-gradient(
+          135deg,
+          rgba(185, 128, 160, 0.2),
+          rgba(255, 255, 255, 0.65)
+        );
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8),
+          0 8px 14px rgba(112, 62, 87, 0.12);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .side-nav.collapsed .nav-copy {
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
+        max-height: none;
+        width: auto;
+        text-align: center;
+      }
+      .side-nav.collapsed .nav-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--plum);
+      }
+
+      .nav-item.active .nav-icon {
+        background: linear-gradient(135deg, var(--mauve), var(--rose));
+        color: #fff;
+        box-shadow: 0 12px 24px rgba(112, 62, 87, 0.26);
+      }
+
+      .nav-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        transition: opacity var(--transition), transform var(--transition),
+          max-height var(--transition);
+        max-height: 80px;
+      }
+
+      .nav-label {
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .nav-sub {
+        font-size: 13px;
+        color: #6c5b6f;
+      }
+
+      .side-nav.collapsed .nav-copy {
+        opacity: 0;
+        transform: translateX(-8px);
+        pointer-events: none;
+        max-height: 0;
+        max-width: 0;
+        width: 0;
+        overflow: hidden;
+      }
+
+      .side-nav.collapsed .nav-divider {
+        opacity: 0;
+        height: 0;
+        margin: 0;
+        transition: opacity var(--transition), height var(--transition);
+      }
+
+      .side-nav.collapsed .nav-cta {
+        opacity: 0;
+        transform: translateY(6px);
+        pointer-events: none;
+        max-height: 0;
+        padding: 0 14px;
+      }
+
+      .nav-cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        text-decoration: none;
+        background: linear-gradient(135deg, var(--mauve), var(--rose));
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 16px 34px rgba(112, 62, 87, 0.24);
+        transition: transform var(--transition), box-shadow var(--transition),
+          opacity var(--transition), max-height var(--transition);
+        max-height: 60px;
+        overflow: hidden;
+      }
+
+      .nav-cta:hover,
+      .nav-cta:focus-visible {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 36px rgba(112, 62, 87, 0.28);
+        outline: none;
+      }
+
+      @media (max-width: 1024px) {
+        body {
+          padding-bottom: 120px;
+          padding-left: 18px;
+        }
+
+        .side-nav {
+          top: auto;
+          bottom: 18px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: calc(100% - 28px);
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+          border-radius: 18px;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 18px 38px rgba(112, 62, 87, 0.18);
+        }
+
+        .nav-toggle {
+          display: none;
+        }
+
+        .nav-brand,
+        .nav-divider {
+          display: none;
+        }
+
+        .nav-links {
+          flex-direction: row;
+          flex-wrap: nowrap;
+          gap: 10px;
+          justify-content: flex-start;
+          width: 100%;
+          padding: 0;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: thin;
+        }
+
+        .nav-item {
+          flex: 0 0 auto;
+          min-width: 140px;
+          justify-content: center;
+          padding: 10px 12px;
+          margin: 0;
+          width: auto;
+          background: rgba(255, 255, 255, 0.9);
+          border: 1px solid rgba(185, 128, 160, 0.18);
+          transform: none;
+        }
+
+        .nav-item:hover,
+        .nav-item:focus-visible {
+          transform: translateY(-2px);
+        }
+
+        .nav-icon {
+          width: 40px;
+          height: 40px;
+        }
+
+        .nav-copy {
+          align-items: center;
+          text-align: center;
+        }
+
+        .nav-sub {
+          display: none;
+        }
+
+        .nav-cta {
+          display: none;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .side-nav {
+          bottom: 12px;
+          width: calc(100% - 18px);
+          gap: 8px;
+          padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+        }
+
+        .nav-links {
+          gap: 8px;
+        }
+
+        .nav-item {
+          min-width: 120px;
+          padding: 9px 10px;
+          border-radius: 14px;
+          box-shadow: 0 10px 22px rgba(112, 62, 87, 0.14);
+        }
+
+        .nav-icon {
+          width: 36px;
+          height: 36px;
+          font-size: 13px;
+        }
+
+        .nav-label {
+          font-size: 14px;
+        }
+      }
+
+      .page {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      header {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+        align-items: center;
+        padding: 36px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: calc(var(--radius) + 6px);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        position: relative;
+      }
+
+      header::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+            circle at 20% 20%,
+            rgba(185, 128, 160, 0.12),
+            transparent 45%
+          ),
+          radial-gradient(
+            circle at 80% 10%,
+            rgba(198, 152, 166, 0.16),
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 65% 80%,
+            rgba(112, 62, 87, 0.08),
+            transparent 42%
+          );
+        pointer-events: none;
+      }
+
+      .hero-text {
+        position: relative;
+        z-index: 1;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        background: rgba(185, 128, 160, 0.14);
+        color: var(--plum);
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      h1 {
+        margin: 14px 0 12px;
+        font-size: clamp(32px, 3vw, 46px);
+        line-height: 1.1;
+        color: var(--plum);
+        letter-spacing: -0.02em;
+      }
+
+      h2 {
+        margin: 0 0 16px;
+        font-size: 24px;
+        color: var(--plum);
+        letter-spacing: -0.01em;
+      }
+
+      p {
+        margin: 0;
+        color: #413641;
+        line-height: 1.6;
+      }
+
+      section {
+        margin-top: 34px;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 26px;
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          120deg,
+          rgba(185, 128, 160, 0.08),
+          transparent 45%
+        );
+        pointer-events: none;
+      }
+
+      .download-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 18px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px 18px;
+        width: 100%;
+        background: linear-gradient(135deg, var(--mauve), var(--rose));
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 16px;
+        box-shadow: 0 12px 28px rgba(112, 62, 87, 0.28);
+        cursor: pointer;
+        transition: transform var(--transition), box-shadow var(--transition),
+          filter var(--transition);
+        text-decoration: none;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 32px rgba(112, 62, 87, 0.32);
+        filter: brightness(1.02);
+      }
+
+      .btn.secondary {
+        background: #fff;
+        color: var(--plum);
+        border: 1px solid rgba(112, 62, 87, 0.15);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+      }
+
+      /* How-to area with more visual, soft cards */
+      #how-to .card {
+        background: linear-gradient(
+          145deg,
+          rgba(185, 128, 160, 0.08),
+          rgba(198, 152, 166, 0.04)
+        );
+        border-radius: 26px;
+        border: 1px solid rgba(185, 128, 160, 0.16);
+        box-shadow: 0 22px 48px rgba(112, 62, 87, 0.16);
+        backdrop-filter: blur(4px);
+      }
+
+      .how-intro {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .how-eyebrow {
+        align-self: flex-start;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(112, 62, 87, 0.08);
+        color: var(--plum);
+        font-weight: 600;
+        font-size: 13px;
+        border: 1px solid rgba(112, 62, 87, 0.12);
+        box-shadow: 0 8px 18px rgba(112, 62, 87, 0.1);
+      }
+
+      .how-intro p {
+        margin: 0;
+        color: #3c2f3b;
+        line-height: 1.55;
+      }
+
+      .steps-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 18px;
+        margin-top: 8px;
+      }
+
+      .step {
+        background: linear-gradient(160deg, #fff, #faf7f9);
+        padding: 22px;
+        border-radius: 22px;
+        border: 1px solid rgba(185, 128, 160, 0.18);
+        box-shadow: 0 18px 34px rgba(112, 62, 87, 0.14);
+        transition: transform var(--transition), box-shadow var(--transition);
+        min-height: 240px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .step:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 22px 42px rgba(112, 62, 87, 0.18);
+      }
+
+      .icon-circle {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 30% 30%,
+          rgba(255, 255, 255, 0.9),
+          rgba(185, 128, 160, 0.18)
+        );
+        display: grid;
+        place-items: center;
+        margin-bottom: 4px;
+        color: var(--plum);
+        font-weight: 800;
+        font-size: 16px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8),
+          0 10px 18px rgba(112, 62, 87, 0.12);
+      }
+
+      .step-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--plum);
+        letter-spacing: -0.01em;
+      }
+
+      .step p {
+        font-size: 17px;
+        line-height: 1.6;
+        color: #3c2f3b;
+      }
+
+      .step p strong {
+        color: var(--plum);
+      }
+
+      .step-note {
+        margin-top: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 10px;
+        border-radius: 12px;
+        background: rgba(185, 128, 160, 0.1);
+        border: 1px dashed rgba(185, 128, 160, 0.3);
+        font-size: 13px;
+        color: #463749;
+        font-weight: 600;
+      }
+
+      .edu {
+        background: #fff;
+        border-radius: calc(var(--radius) + 6px);
+        border: 1px solid var(--border);
+        box-shadow: 0 16px 40px rgba(112, 62, 87, 0.18);
+        padding: 26px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .edu::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+            circle at 30% 10%,
+            rgba(198, 152, 166, 0.22),
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 70% 90%,
+            rgba(185, 128, 160, 0.16),
+            transparent 42%
+          );
+        pointer-events: none;
+      }
+
+      .edu > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .path-switch {
+        display: flex;
+        gap: 12px;
+        margin: 18px 0 10px;
+        flex-wrap: wrap;
+      }
+
+      .path-btn {
+        padding: 10px 14px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(185, 128, 160, 0.12);
+        color: var(--plum);
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform var(--transition), box-shadow var(--transition),
+          background var(--transition);
+        box-shadow: 0 8px 20px rgba(112, 62, 87, 0.12);
+      }
+
+      .path-btn.active {
+        background: linear-gradient(135deg, var(--mauve), var(--rose));
+        color: #fff;
+        box-shadow: 0 12px 28px rgba(112, 62, 87, 0.26);
+        transform: translateY(-1px);
+      }
+
+      .path-panels {
+        margin-top: 12px;
+      }
+
+      .path-panel {
+        display: none;
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity 300ms ease, transform 300ms ease;
+      }
+
+      .path-panel.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .lesson {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        box-shadow: 0 12px 28px rgba(112, 62, 87, 0.12);
+        margin-top: 12px;
+        overflow: hidden;
+      }
+
+      .lesson-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        gap: 12px;
+      }
+
+      .lesson-title {
+        font-weight: 600;
+        color: var(--plum);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .caret {
+        transition: transform var(--transition);
+        color: var(--plum);
+        font-weight: 700;
+      }
+
+      .lesson.active .caret {
+        transform: rotate(180deg);
+      }
+
+      .lesson-content {
+        max-height: 0;
+        transition: max-height 320ms ease;
+        overflow: hidden;
+        margin-top: 8px;
+      }
+
+      .lesson.active .lesson-content {
+        margin-top: 12px;
+      }
+
+      .formula {
+        background: rgba(185, 128, 160, 0.08);
+        border: 1px dashed rgba(112, 62, 87, 0.22);
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 14px;
+        color: #3a303c;
+      }
+
+      .copy-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: linear-gradient(135deg, var(--mauve), var(--rose));
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 10px 24px rgba(112, 62, 87, 0.18);
+        position: relative;
+        transition: transform var(--transition), box-shadow var(--transition);
+      }
+
+      .copy-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 28px rgba(112, 62, 87, 0.22);
+      }
+
+      .copy-btn::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: calc(100% + 8px);
+        right: 0;
+        background: var(--plum);
+        color: #fff;
+        font-size: 12px;
+        padding: 6px 8px;
+        border-radius: 8px;
+        opacity: 0;
+        transform: translateY(6px);
+        pointer-events: none;
+        transition: opacity 180ms ease, transform 180ms ease;
+        white-space: nowrap;
+      }
+
+      .copy-btn[data-copied="true"]::after {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        background: rgba(185, 128, 160, 0.14);
+        color: var(--plum);
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .note {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #4d4250;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 22px 14px 60px;
+        }
+        .btn {
+          font-size: 15px;
+        }
+        .card,
+        .edu {
+          padding: 20px;
+        }
+        .lesson {
+          padding: 12px 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="side-nav" aria-label="Quick navigation">
+      <button
+        class="nav-toggle"
+        type="button"
+        aria-label="Toggle sidebar"
+        aria-expanded="true"
+      >
+        ⇆
+      </button>
+      <div class="nav-brand" aria-label="Navigation brand">
+        <div class="nav-emoji">✓</div>
+        <div class="nav-meta">
+          <span class="nav-eyebrow">Template guide</span>
+          <span class="nav-title">Quick jumps</span>
+        </div>
+      </div>
+      <div class="nav-divider" aria-hidden="true"></div>
+      <div class="nav-links">
+        <a class="nav-item active" href="#hero">
+          <span class="nav-icon">01</span>
+          <div class="nav-copy">
+            <span class="nav-label">Overview</span>
+            <span class="nav-sub">Welcome</span>
+          </div>
+        </a>
+        <a class="nav-item" href="#downloads">
+          <span class="nav-icon">02</span>
+          <div class="nav-copy">
+            <span class="nav-label">Download</span>
+            <span class="nav-sub">Pick format</span>
+          </div>
+        </a>
+        <a class="nav-item" href="#how-to">
+          <span class="nav-icon">03</span>
+          <div class="nav-copy">
+            <span class="nav-label">Feature tour</span>
+            <span class="nav-sub">Inside the sheet</span>
+          </div>
+        </a>
+        <a class="nav-item" href="#education">
+          <span class="nav-icon">04</span>
+          <div class="nav-copy">
+            <span class="nav-label">Academy</span>
+            <span class="nav-sub">Guided lessons</span>
+          </div>
+        </a>
+        <a class="nav-item" href="#extras">
+          <span class="nav-icon">05</span>
+          <div class="nav-copy">
+            <span class="nav-label">Extras</span>
+            <span class="nav-sub">More templates</span>
+          </div>
+        </a>
+      </div>
+      <div class="nav-divider" aria-hidden="true"></div>
+      <a class="nav-cta" href="#downloads">
+        <span>↓</span>
+        <span>Get the template</span>
+      </a>
+    </nav>
+
+    <main class="page">
+      <header id="hero">
+        <div class="hero-text">
+          <div class="pill">Minimalist • Calm • Ready to use</div>
+          <h1>Your Minimalist To-Do List Template</h1>
+          <p>
+            Designed for clarity, calm, and effortless productivity. Download
+            your preferred format, follow the simple steps, and enjoy the
+            premium learning path that helps you solve real-life spreadsheet
+            problems.
+          </p>
+        </div>
+      </header>
+
+      <section id="downloads">
+        <div class="card">
+          <h2>Download Your Template</h2>
+          <p>
+            Choose the format you love. Both options use the same calm,
+            minimalist layout.
+          </p>
+          <div class="download-grid" style="margin-top: 16px">
+            <a
+              class="btn"
+              href="https://docs.google.com/spreadsheets/d/1U8VhMFoDuX8jaivs6_Gq4ZgYzoi4HZvvRQP2dNyiA0c/copy?usp=sharing"
+              target="_blank"
+              rel="noreferrer"
+              >Make a Copy – Google Sheets</a
+            >
+            <a
+              class="btn secondary"
+              href="https://drive.google.com/uc?export=download&id=1f5KPoYwN3f3zRpBuBJqSyQkI2ZPGm4jQ"
+              target="_blank"
+              rel="noreferrer"
+              >Download – Excel Version</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section id="how-to">
+        <div class="quickstart" style="padding: 38px 26px">
+          <h2
+            class="qs-title"
+            style="font-size: 30px; text-align: center; margin-bottom: 16px"
+          >
+            Inside Your To‑Do List
+          </h2>
+          <p
+            style="
+              max-width: 620px;
+              margin: 0 auto 34px;
+              text-align: center;
+              font-size: 17px;
+              color: #4a3d48;
+            "
+          >
+            Here’s a quick, friendly tour showing exactly how your template
+            works — based on the real features displayed inside the sheet. No
+            guessing, no confusion.
+          </p>
+
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(
+                auto-fit,
+                minmax(260px, max-content)
+              );
+              place-content: center;
+              gap: 26px;
+              justify-items: center;
+              justify-content: center;
+            "
+          >
+            <div
+              style="
+                max-width: 360px;
+                width: 100%;
+                background: #fff;
+                border: 1px solid rgba(185, 128, 160, 0.26);
+                border-radius: 22px;
+                padding: 26px;
+                box-shadow: 0 14px 32px rgba(112, 62, 87, 0.12);
+              "
+            >
+              <h3 style="margin: 0 0 10px; color: var(--plum); font-size: 20px">
+                ✨ Custom Header
+              </h3>
+              <p style="margin: 0; color: #4a3d48">
+                Personalize your list title. Change it to your day, project
+                name, or weekly focus.
+              </p>
+            </div>
+
+            <div
+              style="
+                max-width: 360px;
+                width: 100%;
+                background: #fff;
+                border: 1px solid rgba(185, 128, 160, 0.26);
+                border-radius: 22px;
+                padding: 26px;
+                box-shadow: 0 14px 32px rgba(112, 62, 87, 0.12);
+              "
+            >
+              <h3 style="margin: 0 0 10px; color: var(--plum); font-size: 20px">
+                📅 Due Date Display
+              </h3>
+              <p style="margin: 0; color: #4a3d48">
+                Uses a smart formula to show Today automatically — or replace it
+                with any custom date.
+              </p>
+            </div>
+
+            <div
+              style="
+                max-width: 360px;
+                width: 100%;
+                background: #fff;
+                border: 1px solid rgba(185, 128, 160, 0.26);
+                border-radius: 22px;
+                padding: 26px;
+                box-shadow: 0 14px 32px rgba(112, 62, 87, 0.12);
+              "
+            >
+              <h3 style="margin: 0 0 10px; color: var(--plum); font-size: 20px">
+                ☑️ Checkable Tasks
+              </h3>
+              <p style="margin: 0; color: #4a3d48">
+                Mark tasks complete with one click — they automatically cross
+                out and update progress.
+              </p>
+            </div>
+
+            <div
+              style="
+                max-width: 360px;
+                width: 100%;
+                background: #fff;
+                border: 1px solid rgba(185, 128, 160, 0.26);
+                border-radius: 22px;
+                padding: 26px;
+                box-shadow: 0 14px 32px rgba(112, 62, 87, 0.12);
+              "
+            >
+              <h3 style="margin: 0 0 10px; color: var(--plum); font-size: 20px">
+                🎨 Color‑Coded Rows
+              </h3>
+              <p style="margin: 0; color: #4a3d48">
+                Choose from High, Medium, Done, or Default. Colors update
+                instantly as you switch priorities.
+              </p>
+            </div>
+
+            <div
+              style="
+                max-width: 360px;
+                width: 100%;
+                background: #fff;
+                border: 1px solid rgba(185, 128, 160, 0.26);
+                border-radius: 22px;
+                padding: 26px;
+                box-shadow: 0 14px 32px rgba(112, 62, 87, 0.12);
+              "
+            >
+              <h3 style="margin: 0 0 10px; color: var(--plum); font-size: 20px">
+                📊 Progress Bar
+              </h3>
+              <p style="margin: 0; color: #4a3d48">
+                Fills up automatically as you complete tasks — no formulas
+                needed.
+              </p>
+            </div>
+
+            <div
+              style="
+                max-width: 360px;
+                width: 100%;
+                background: #fff;
+                border: 1px solid rgba(185, 128, 160, 0.26);
+                border-radius: 22px;
+                padding: 26px;
+                box-shadow: 0 14px 32px rgba(112, 62, 87, 0.12);
+              "
+            >
+              <h3 style="margin: 0 0 10px; color: var(--plum); font-size: 20px">
+                📌 Open vs Done Counters
+              </h3>
+              <p style="margin: 0; color: #4a3d48">
+                Automatically counts how many tasks remain open vs completed —
+                updated in real time.
+              </p>
+            </div>
+
+            <div
+              style="
+                max-width: 360px;
+                width: 100%;
+                background: #fff;
+                border: 1px solid rgba(185, 128, 160, 0.26);
+                border-radius: 22px;
+                padding: 26px;
+                box-shadow: 0 14px 32px rgba(112, 62, 87, 0.12);
+              "
+            >
+              <h3 style="margin: 0 0 10px; color: var(--plum); font-size: 20px">
+                📝 Notes Section
+              </h3>
+              <p style="margin: 0; color: #4a3d48">
+                Add reminders, context, quick references, or anything you want
+                to keep in view.
+              </p>
+            </div>
+          </div>
+
+          <p
+            style="
+              margin-top: 34px;
+              text-align: center;
+              color: #4a3d48;
+              font-size: 15px;
+            "
+          >
+            These features work together to keep your workflow simple, elegant,
+            and stress‑free.
+          </p>
+        </div>
+      </section>
+
+      <section id="education">
+        <div class="edu">
+          <h2>Learn to Solve Real Problems</h2>
+          <p>
+            <strong
+              >As a thank‑you for your purchase, we created this special
+              learning area — simple, friendly, and designed for people who have
+              NEVER written a formula before.</strong
+            >
+          </p>
+          <p style="margin-top: 8px">
+            Start with universal skills that work in BOTH Excel and Google
+            Sheets. Then, explore small extras unique to each program.
+          </p>
+          <h3 style="margin-top: 26px; color: var(--plum); font-size: 22px">
+            🎓 Mini Academy — Foundations for Total Beginners
+          </h3>
+
+          <div
+            class="lesson"
+            style="
+              margin-top: 22px;
+              border: 1px solid rgba(185, 128, 160, 0.22);
+              border-radius: var(--radius);
+              background: #fff7fb;
+            "
+          >
+            <div class="lesson-header">
+              <div class="lesson-title">
+                <span class="tag">Mini Academy • Step 1</span>
+                <span>“The 30‑second intro for complete beginners.”</span>
+              </div>
+              <span class="caret">⌄</span>
+            </div>
+
+            <div class="lesson-content">
+              <p class="note">
+                If you’ve NEVER written a formula before — don’t worry. This
+                ultra‑quick guide will make everything simple.
+              </p>
+
+              <p class="note">
+                <strong>💡 What is a formula?</strong><br />
+                It’s just a tiny instruction you type into one cell, like using
+                a calculator. If something looks weird, simply delete it —
+                nothing breaks.
+              </p>
+
+              <p class="note">
+                <strong>📍 Where do formulas go?</strong><br />
+                Always inside ONE empty cell (usually A1). You can put formulas
+                in:
+                <br />• the <strong>same tab</strong> as your list, OR <br />• a
+                <strong>new tab</strong> if you want a cleaner view.
+              </p>
+
+              <p class="note">
+                <strong>➕ How to create a new tab:</strong><br />
+                Click the <strong>+</strong> button at the bottom → name it
+                anything (“Filtered View”, “My Window”, etc.).
+              </p>
+
+              <p class="note">
+                <strong>🔠 What does A2:F200 mean?</strong><br />
+                It’s just the area where your tasks live. If your list is
+                shorter (e.g., only up to row 60), just change 200 → 60.
+              </p>
+
+              <p class="note">
+                <strong>🛡️ Your template is safe:</strong><br />
+                Formulas here don’t touch or modify your original list — they
+                only show a separate “view”. Worst case? Delete the formula and
+                try again.
+              </p>
+            </div>
+          </div>
+
+          <div class="lesson">
+            <div class="lesson-header">
+              <div class="lesson-title">
+                <span class="tag">Mini Academy • Step 2</span>
+                <span>How formulas think (your new mental model).</span>
+              </div>
+              <span class="caret">⌄</span>
+            </div>
+            <div class="lesson-content">
+              <p class="note">
+                Formulas work like a tiny robot that follows clear instructions
+                step by step.
+              </p>
+              <p class="note">
+                Every formula starts with <code>=</code> and usually follows
+                this idea:
+                <br />
+                <code
+                  >= FUNCTION( what_to_use , how_to_filter_or_calculate ,
+                  extra_options )</code
+                >
+              </p>
+              <p class="note">
+                You always type a formula in one cell, press Enter, and the
+                sheet shows the result. If something looks wrong, simply delete
+                it — your original data stays safe.
+              </p>
+            </div>
+          </div>
+
+          <div class="lesson">
+            <div class="lesson-header">
+              <div class="lesson-title">
+                <span class="tag">Mini Academy • Step 3</span>
+                <span>Ranges 101 — reading A2:F200 without fear.</span>
+              </div>
+              <span class="caret">⌄</span>
+            </div>
+            <div class="lesson-content">
+              <p class="note">
+                A <strong>range</strong> is just an area in your sheet.
+              </p>
+              <p class="note">
+                <code>A2:A100</code> = one column (A), from row 2 to row 100.<br />
+                <code>A2:F200</code> = a rectangle from column A to F, rows 2 to
+                200.<br />
+                <code>'Tasks'!A2:F200</code> = the same rectangle, but on a tab
+                called “Tasks”.
+              </p>
+              <p class="note">
+                If your list is shorter, you only change the last number. For
+                example, if your list stops at row 60, use
+                <code>A2:F60</code> instead of <code>A2:F200</code>.
+              </p>
+              <p class="note">
+                <strong
+                  >📄 How to write a range from another tab (with clear
+                  examples)</strong
+                ><br />
+                When your data lives in a different tab, you simply add the tab
+                name + an exclamation mark before the range.<br /><br />
+
+                Here are the most common examples:<br />
+                • <code>'Tasks'!A2:F200</code> → data in a tab called
+                <strong>Tasks</strong>.<br />
+                • <code>'My List'!C2:C60</code> → a column in a tab with spaces
+                in its name (“My List”).<br />
+                • <code>'2025 Projects'!A2:B500</code> → tables inside tabs with
+                numbers and spaces.<br /><br />
+
+                <strong>Important:</strong> If your tab name contains
+                <em>any</em> spaces or special characters, ALWAYS wrap it in
+                single quotes:<br />
+                <code>'My List'!A2:A200</code> ✔<br />
+                <code>My List!A2:A200</code> ❌ (this will break)<br /><br />
+
+                <strong>❗ What the exclamation mark means</strong><br />
+                The <code>!</code> simply tells Excel/Sheets: “Look inside this
+                tab, then find this range.”<br />
+                Think of it like a tiny arrow pointing from the tab name → to
+                the cells.<br />
+                Example: <code>'Tasks'!A2:F200</code> means:<br />
+                • Go to the tab called <strong>Tasks</strong><br />
+                • Then read the range <strong>A2:F200</strong><br /><br />
+
+                <em>Tip:</em> This works perfectly when you
+                <strong>start typing a formula in one tab</strong> (for example,
+                in “Filtered View”) and then
+                <strong>click on the other tab where your data lives</strong>.
+                Sheets/Excel will automatically insert the correct format,
+                including the tab name and the exclamation mark — even if the
+                tab has spaces or special characters. <br /><br />
+                <strong>🔁 Extra clarity:</strong><br />
+                This auto‑insert only works when you
+                <strong>start the formula in one tab</strong> (for example
+                “Filtered View”), and then <strong>switch tabs</strong> to click
+                the cells where your data is. If you try clicking another tab
+                <em>after</em> finishing the formula, nothing happens — you must
+                switch tabs <strong>while</strong> the formula is being typed so
+                the sheet knows you're selecting a reference.
+              </p>
+            </div>
+          </div>
+
+          <div class="lesson">
+            <div class="lesson-header">
+              <div class="lesson-title">
+                <span class="tag">Mini Academy • Step 4</span>
+                <span>Inside a function: arguments made simple.</span>
+              </div>
+              <span class="caret">⌄</span>
+            </div>
+            <div class="lesson-content">
+              <p class="note">
+                When you see something like:
+                <br />
+                <code>=FILTER(A2:F200, C2:C200="Open")</code>
+                <br />
+                think of it like this:
+              </p>
+              <p class="note">
+                • <strong>FILTER</strong> → the tool you’re using (“show only
+                what matches…”)<br />
+                • <strong>A2:F200</strong> → the full list where your data
+                lives<br />
+                • <strong>C2:C200</strong> → the column that has the condition
+                (for example “Open”)<br />
+                • <strong>"Open"</strong> → the exact text you are filtering by
+              </p>
+              <p class="note">
+                Once you understand this structure, you can swap the column, the
+                word, or the range to match your own sheet — that’s how you
+                “customize” a formula for your scenario.
+              </p>
+            </div>
+          </div>
+
+          <h3 style="margin-top: 30px; color: var(--plum); font-size: 22px">
+            ✨ Start Here – Core Skills (Excel + Google Sheets)
+          </h3>
+
+          <div class="lesson active">
+            <div class="lesson-header">
+              <div class="lesson-title">
+                <span class="tag">Core Skill 1</span>
+                <span>“Show only what truly matters.”</span>
+              </div>
+              <span class="caret">⌄</span>
+            </div>
+            <div class="lesson-content">
+              <p
+                class="note"
+                style="
+                  background: #fff4fa;
+                  border: 1px dashed rgba(185, 128, 160, 0.4);
+                  padding: 10px 12px;
+                  border-radius: 10px;
+                  margin-bottom: 12px;
+                "
+              >
+                <strong>📍 Where to put this formula</strong><br />
+                You can place this formula in <strong>a new tab</strong> to keep
+                your main to‑do list clean.<br /><br />
+                • Click the <strong>+</strong> at the bottom → name the tab
+                <strong>“Open Tasks View”</strong>.<br />
+                • Click on cell <strong>A1</strong> in that new tab.<br />
+                • Paste the formula below — it will automatically pull your open
+                tasks from the main list.<br /><br />
+                <em>Tip:</em> If your tasks are in another tab (like “To‑Do”),
+                Sheets/Excel may auto‑add the tab name. Example:
+                <code>=FILTER('To‑Do'!A2:F200, 'To‑Do'!C2:C200="Open")</code>
+              </p>
+              <p class="note">
+                Story: Imagine your to‑do list gets messy. You want to see ONLY
+                what is still open.
+              </p>
+              <p class="note">
+                Solution: Think of <strong>FILTER</strong> as a pasta strainer —
+                it keeps only what you choose.
+              </p>
+              <p class="note">
+                <strong>Pattern you can reuse:</strong><br />
+                <code>=FILTER( data_range , condition_range = "value" )</code
+                ><br />
+                • Replace <code>data_range</code> with your full table (for
+                example <code>A2:F60</code>).<br />
+                • Replace <code>condition_range</code> with the column you’re
+                checking (for example <code>C2:C60</code>).<br />
+                • Replace <code>"value"</code> with what you want (for example
+                <code>"High"</code> or <code>"Done"</code>).<br />
+                This simple pattern works for many situations: open tasks, a
+                specific project, priority, category, and more.
+              </p>
+              <div class="formula">
+                <span>= FILTER(A2:F200, C2:C200="Open")</span>
+                <button
+                  class="copy-btn"
+                  data-formula='= FILTER(A2:F200, C2:C200="Open")'
+                  data-tooltip="Copied!"
+                  aria-label="Copy formula"
+                >
+                  <span>📋</span> Copy
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lesson">
+            <div class="lesson-header">
+              <div class="lesson-title">
+                <span class="tag">Core Skill 2</span>
+                <span>“Remove duplicates instantly.”</span>
+              </div>
+              <span class="caret">⌄</span>
+            </div>
+            <div class="lesson-content">
+              <p
+                class="note"
+                style="
+                  background: #fff4fa;
+                  border: 1px dashed rgba(185, 128, 160, 0.4);
+                  padding: 10px 12px;
+                  border-radius: 10px;
+                  margin-bottom: 12px;
+                "
+              >
+                <strong>📍 Where to put this formula</strong><br />
+                Create a new tab called <strong>“Unique List”</strong> or use
+                any empty tab.<br /><br />
+                • Click cell <strong>A1</strong> in that tab.<br />
+                • Paste the formula — it will pull a clean, duplicate‑free
+                list.<br /><br />
+
+                <strong>🔍 What each part means:</strong><br />
+                • <code>A2:A500</code> → the column where your items are
+                stored.<br />
+                • If your list is shorter, change <code>500</code> to your last
+                row.<br />
+                • <strong>UNIQUE()</strong> → removes repeated entries
+                automatically.
+              </p>
+              <p class="note">
+                Solution: <strong>UNIQUE</strong> gives you a clean list with
+                zero repeats.
+              </p>
+              <p class="note">
+                <strong>Pattern you can reuse:</strong><br />
+                <code>=UNIQUE( one_column_range )</code><br />
+                Use it for: client names, categories, project names, tags, or
+                any list where you only want each value once. Once you have this
+                clean list, you can use it in dropdowns, summaries, or
+                dashboards.
+              </p>
+              <div class="formula">
+                <span>= UNIQUE(A2:A500)</span>
+                <button
+                  class="copy-btn"
+                  data-formula="= UNIQUE(A2:A500)"
+                  data-tooltip="Copied!"
+                  aria-label="Copy formula"
+                >
+                  <span>📋</span> Copy
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lesson">
+            <div class="lesson-header">
+              <div class="lesson-title">
+                <span class="tag">Core Skill 3</span>
+                <span>“Sort automatically forever.”</span>
+              </div>
+              <span class="caret">⌄</span>
+            </div>
+            <div class="lesson-content">
+              <p
+                class="note"
+                style="
+                  background: #fff4fa;
+                  border: 1px dashed rgba(185, 128, 160, 0.4);
+                  padding: 10px 12px;
+                  border-radius: 10px;
+                  margin-bottom: 12px;
+                "
+              >
+                <strong>📍 Where to put this formula</strong><br />
+                Use a new tab named <strong>“Sorted View”</strong> or any clean
+                tab.<br /><br />
+                • Click cell <strong>A1</strong>.<br />
+                • Paste the formula — it will show the same table, but neatly
+                sorted.<br /><br />
+
+                <strong>🔍 What each part means:</strong><br />
+                • <code>A2:D200</code> → the table you want to sort.<br />
+                • <code>1</code> → the column number to sort by (1 = first
+                column).<br />
+                • <code>TRUE</code> → sort ascending (A → Z, 1 → 9).
+              </p>
+              <p class="note">
+                Solution: <strong>SORT</strong> keeps everything organized
+                without touching anything again.
+              </p>
+              <p class="note">
+                <strong>Pattern you can reuse:</strong><br />
+                <code>=SORT( table_range , column_number , TRUE_or_FALSE )</code
+                ><br />
+                • <code>table_range</code> = the full table you want sorted.<br />
+                • <code>column_number</code> = 1 for the first column, 2 for the
+                second, etc.<br />
+                • <code>TRUE</code> = ascending (A–Z), <code>FALSE</code> =
+                descending (Z–A).<br />
+                You can use this to sort tasks by priority, date, status, or any
+                other column.
+              </p>
+              <div class="formula">
+                <span>= SORT(A2:D200, 1, TRUE)</span>
+                <button
+                  class="copy-btn"
+                  data-formula="= SORT(A2:D200, 1, TRUE)"
+                  data-tooltip="Copied!"
+                  aria-label="Copy formula"
+                >
+                  <span>📋</span> Copy
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lesson">
+            <div class="lesson-header">
+              <div class="lesson-title">
+                <span class="tag">Core Skill 4</span>
+                <span>“Combine text automatically.”</span>
+              </div>
+              <span class="caret">⌄</span>
+            </div>
+            <div class="lesson-content">
+              <p
+                class="note"
+                style="
+                  background: #fff4fa;
+                  border: 1px dashed rgba(185, 128, 160, 0.4);
+                  padding: 10px 12px;
+                  border-radius: 10px;
+                  margin-bottom: 12px;
+                "
+              >
+                <strong>📍 Where to put this formula</strong><br />
+                You can place this in the same tab OR a small helper tab called
+                <strong>“Labels”</strong>.<br /><br />
+                • Click an empty cell (for example A1).<br />
+                • Paste the formula — it will combine two columns into one
+                label.<br /><br />
+
+                <strong>🔍 What each part means:</strong><br />
+                • <code>A2</code> → first piece of text (e.g., first name).<br />
+                • <code>B2</code> → second piece (e.g., last name).<br />
+                • <code>" "</code> → adds a space between them.<br />
+                • <code>&amp;</code> → tells Excel/Sheets to glue the pieces
+                together.
+              </p>
+              <p class="note">
+                Solution: Use a quick join for clean labels or names.
+              </p>
+              <p class="note">
+                <strong>Pattern you can reuse:</strong><br />
+                <code>= first_cell &amp; " " &amp; second_cell</code><br />
+                Change the space (<code>" "</code>) to a dash (<code>" - "</code
+                >), comma, or any text you like. Perfect for labels like “Client
+                - Project”, “Category - Task”, or “Initials (Name)”.
+              </p>
+              <div class="formula">
+                <span>= A2 &amp; " " &amp; B2</span>
+                <button
+                  class="copy-btn"
+                  data-formula='= A2 & " " & B2'
+                  data-tooltip="Copied!"
+                  aria-label="Copy formula"
+                >
+                  <span>📋</span> Copy
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <h3 style="margin-top: 40px; color: var(--plum); font-size: 22px">
+            🧩 Excel‑Only Mini Booster — Flash Fill (Magic for Repetitive Tasks)
+          </h3>
+
+          <div class="lesson">
+            <div class="lesson-header">
+              <div class="lesson-title">
+                <span class="tag">Excel+</span>
+                <span>Flash Fill — let Excel complete the pattern for you</span>
+              </div>
+              <span class="caret">⌄</span>
+            </div>
+
+            <div class="lesson-content">
+              <p
+                class="note"
+                style="
+                  background: #fff4fa;
+                  border: 1px dashed rgba(185, 128, 160, 0.4);
+                  padding: 10px 12px;
+                  border-radius: 10px;
+                "
+              >
+                <strong
+                  >📍 What Flash Fill does (super simple explanation)</strong
+                ><br />
+                Flash Fill looks at the example you type in one cell and
+                instantly completes the whole column following the same
+                pattern.<br /><br />
+                You do <strong>one</strong> example → Excel completes the
+                rest.<br />
+                <em>No formulas. No setup. Pure time‑saving magic.</em>
+              </p>
+
+              <p class="note">
+                <strong>🎯 How to use it (Windows & Mac)</strong><br />
+                1) Type the result you want in the first cell.<br />
+                2) Move to the next row.<br />
+                3) Press:<br />
+                • <strong>Ctrl + E</strong> (Windows)<br />
+                • <strong>⌘ + E</strong> (Mac)<br /><br />
+                Excel instantly fills the entire column for you.
+              </p>
+
+              <p class="note">
+                <strong>🧠 Scenario 1 — Extract first names</strong><br />
+                Column A:<br />
+                <code>John Doe</code><br />
+                <code>Sarah Blake</code><br />
+                <code>Tom Hanks</code><br /><br />
+                In B2, type:<br />
+                <code>John</code><br />
+                Go to B3 → press Ctrl/⌘ + E → Excel fills:<br />
+                <code>John, Sarah, Tom</code>
+              </p>
+
+              <p class="note">
+                <strong>🧠 Scenario 2 — Extract last names</strong><br />
+                In B2, type:<br />
+                <code>Doe</code><br />
+                Press Ctrl/⌘ + E → Excel fills:<br />
+                <code>Doe, Blake, Hanks</code>
+              </p>
+
+              <p class="note">
+                <strong
+                  >🧠 Scenario 3 — Create clean labels automatically</strong
+                ><br />
+                A: <code>John</code><br />
+                B: <code>Doe</code><br /><br />
+                In C2 type:<br />
+                <code>John Doe</code><br />
+                Press Ctrl/⌘ + E → Excel fills all rows.<br /><br />
+                <em
+                  >Perfect for combining names, tasks, categories, or project
+                  codes.</em
+                >
+              </p>
+
+              <p class="note">
+                <strong>🧠 Scenario 4 — Remove prefixes or messy text</strong
+                ><br />
+                A2: <code>INV‑2241</code><br />
+                In B2 type:<br />
+                <code>2241</code><br />
+                Press Ctrl/⌘ + E → Excel removes “INV‑” from all rows.
+              </p>
+
+              <p class="note">
+                <strong>🧠 Scenario 5 — Extract username from emails</strong
+                ><br />
+                A2: <code>john.doe@email.com</code><br />
+                In B2 type:<br />
+                <code>john.doe</code><br />
+                Press Ctrl/⌘ + E → Excel extracts every username automatically.
+              </p>
+
+              <p class="note">
+                <strong>💡 Why this matters:</strong><br />
+                Flash Fill is one of the fastest ways in Excel to clean data,
+                split names, create labels, extract patterns, remove symbols,
+                and standardize text — all without writing a single formula.<br /><br />
+                <strong
+                  >This feature exists only in Excel. Google Sheets does not
+                  have Flash Fill.</strong
+                >
+              </p>
+            </div>
+          </div>
+
+          <h3 style="margin-top: 40px; color: var(--plum); font-size: 22px">
+            🧩 Google Sheets‑Only Mini Boosters
+          </h3>
+
+          <div class="lesson">
+            <div class="lesson-header">
+              <div class="lesson-title">
+                <span class="tag">Sheets+</span>
+                <span>Make formulas continue automatically</span>
+              </div>
+              <span class="caret">⌄</span>
+            </div>
+            <div class="lesson-content">
+              <p
+                class="note"
+                style="
+                  background: #fff4fa;
+                  border: 1px dashed rgba(185, 128, 160, 0.4);
+                  padding: 10px 12px;
+                  border-radius: 10px;
+                  margin-bottom: 12px;
+                "
+              >
+                <strong>📍 Where to put this formula</strong><br />
+                Use this directly in the tab where your data lives (for example
+                “Tasks”).<br />
+                • Click on an empty column header (for example cell
+                <strong>E2</strong>).<br />
+                • Paste the formula — it will automatically fill all rows below.
+              </p>
+              <p class="note">
+                <strong>What ARRAYFORMULA does:</strong><br />
+                Instead of writing one formula per row,
+                <strong>ARRAYFORMULA</strong> lets one formula work for the
+                whole column at once.
+              </p>
+              <p class="note">
+                <strong>Breaking it down:</strong><br />
+                • <code>IF(A2:A="",</code>…<code>)</code> → skips blank rows.<br />
+                • <code>A2:A &amp; " - " &amp; B2:B</code> → combines two
+                columns with “ - ” in the middle.<br />
+              </p>
+              <p class="note">
+                <strong>Pattern you can reuse:</strong><br />
+                <code>=ARRAYFORMULA( your_row_by_row_logic_here )</code><br />
+                First build a formula that works for one row (for example in row
+                2). Then wrap it with <code>ARRAYFORMULA(</code> &amp; your
+                formula &amp; <code>)</code> to make it work for all rows.
+              </p>
+              <div class="formula">
+                <span
+                  >= ARRAYFORMULA(IF(A2:A="",,A2:A &amp; " - " &amp;
+                  B2:B))</span
+                >
+                <button
+                  class="copy-btn"
+                  data-formula='= ARRAYFORMULA(IF(A2:A="",,A2:A & " - " & B2:B))'
+                  data-tooltip="Copied!"
+                  aria-label="Copy formula"
+                >
+                  <span>📋</span> Copy
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p
+            style="
+              margin-top: 40px;
+              text-align: center;
+              font-size: 15px;
+              color: #4a3d48;
+            "
+          >
+            You’re doing amazing — these tiny skills unlock 80% of everything
+            you'll ever need in spreadsheets. You got this. 💪
+          </p>
+        </div>
+      </section>
+      <section
+        id="extras"
+        style="margin-top: 100px; text-align: center; margin-bottom: 100px"
+      >
+        <div
+          style="
+            background: linear-gradient(145deg, #ffffff, #faf7fa);
+            border: 1px solid rgba(185, 128, 160, 0.18);
+            border-radius: 30px;
+            padding: 48px 60px 56px;
+            box-shadow: 0 26px 48px rgba(112, 62, 87, 0.14);
+            max-width: 1200px;
+            margin: 0 auto;
+          "
+        >
+          <h2 style="color: var(--plum); font-size: 28px; margin-bottom: 18px">
+            ✨ Love this template? See what else we’ve crafted for you.
+          </h2>
+
+          <p
+            style="
+              color: #4a3d48;
+              font-size: 17px;
+              max-width: 900px;
+              margin: 0 auto 34px;
+              line-height: 1.55;
+            "
+          >
+            If you enjoyed how clearly and smoothly this template works, you
+            might love exploring more of our tools — each one designed with the
+            same thoughtful structure, attention to detail, and focus on making
+            your workflow feel lighter and more intuitive.
+          </p>
+
+          <div
+            style="
+              display: flex;
+              flex-wrap: wrap;
+              gap: 20px;
+              justify-content: center;
+              margin-bottom: 16px;
+            "
+          >
+            <a
+              href="https://sheetsbrewery.etsy.com/"
+              target="_blank"
+              rel="noreferrer"
+              style="
+                padding: 16px 28px;
+                border-radius: 999px;
+                background: linear-gradient(135deg, var(--mauve), var(--rose));
+                color: #fff;
+                font-weight: 700;
+                font-size: 17px;
+                text-decoration: none;
+                box-shadow: 0 14px 32px rgba(112, 62, 87, 0.26);
+                transition: transform var(--transition),
+                  box-shadow var(--transition), filter var(--transition);
+              "
+              onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 18px 38px rgba(112,62,87,0.30)';"
+              onmouseout="this.style.transform=''; this.style.boxShadow='0 14px 32px rgba(112,62,87,0.26)';"
+            >
+              🛍 Explore More Templates
+            </a>
+
+            <a
+              href="https://www.etsy.com/your/purchases"
+              target="_blank"
+              rel="noreferrer"
+              style="
+                padding: 16px 28px;
+                border-radius: 999px;
+                background: #fff;
+                border: 2px solid rgba(185, 128, 160, 0.28);
+                color: var(--plum);
+                font-weight: 700;
+                font-size: 17px;
+                text-decoration: none;
+                box-shadow: 0 12px 26px rgba(112, 62, 87, 0.12);
+                transition: transform var(--transition),
+                  box-shadow var(--transition), background var(--transition);
+              "
+              onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 18px 34px rgba(112,62,87,0.20)'; this.style.background='rgba(185,128,160,0.05)';"
+              onmouseout="this.style.transform=''; this.style.boxShadow='0 12px 26px rgba(112,62,87,0.12)'; this.style.background='#fff';"
+            >
+              ⭐ Leave a Review
+            </a>
+          </div>
+
+          <p
+            style="
+              margin-top: 20px;
+              font-size: 14px;
+              color: #5a4c58;
+              max-width: 820px;
+              margin-left: auto;
+              margin-right: auto;
+              line-height: 1.5;
+            "
+          >
+            Reviews help small creators more than you imagine. Every kind word
+            helps us keep building better tools — and helps others discover
+            templates that genuinely make life easier. Thank you for being part
+            of this journey. 💛
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Sidebar accordion toggle
+      const sideNav = document.querySelector(".side-nav");
+      const navToggle = document.querySelector(".nav-toggle");
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+      const setNavState = (collapsed) => {
+        if (!sideNav) return;
+        sideNav.classList.toggle("collapsed", collapsed);
+        document.body.classList.toggle("nav-collapsed", collapsed);
+        if (navToggle) {
+          navToggle.setAttribute("aria-expanded", (!collapsed).toString());
+          navToggle.setAttribute(
+            "aria-label",
+            collapsed ? "Expand sidebar" : "Collapse sidebar"
+          );
+        }
+      };
+
+      const syncNavForViewport = () => {
+        const isMobile = window.innerWidth <= 1024;
+        if (isMobile) {
+          setNavState(false);
+          sideNav?.setAttribute("data-locked", "true");
+        } else {
+          sideNav?.setAttribute("data-locked", "false");
+        }
+      };
+
+      navToggle?.addEventListener("click", () => {
+        if (!sideNav) return;
+        const locked = sideNav.getAttribute("data-locked") === "true";
+        if (locked) return;
+        const nextState = !sideNav.classList.contains("collapsed");
+        setNavState(nextState);
+      });
+
+      window.addEventListener("resize", syncNavForViewport);
+      syncNavForViewport();
+
+      // Floating nav highlighting while scrolling
+      const navLinks = Array.from(document.querySelectorAll(".nav-item"));
+      const observedSections = navLinks
+        .map((link) => document.querySelector(link.getAttribute("href")))
+        .filter(Boolean);
+      let highlightLocked = false;
+      let highlightTimeout;
+
+      const lockHighlight = (duration = 900) => {
+        highlightLocked = true;
+        clearTimeout(highlightTimeout);
+        highlightTimeout = setTimeout(() => {
+          highlightLocked = false;
+          syncNavWithScroll();
+        }, duration);
+      };
+
+      const setActiveLink = (id) => {
+        navLinks.forEach((link) => {
+          const matches = link.getAttribute("href") === `#${id}`;
+          link.classList.toggle("active", matches);
+        });
+      };
+
+      const syncNavWithScroll = () => {
+        if (highlightLocked) return;
+        const targetLine = window.innerHeight * 0.35;
+        let bestSection = null;
+        let bestDistance = Infinity;
+
+        observedSections.forEach((section) => {
+          const rect = section.getBoundingClientRect();
+          const isVisible =
+            rect.bottom > 80 && rect.top < window.innerHeight - 80;
+
+          if (!isVisible) return;
+
+          const distance = Math.abs(rect.top - targetLine);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestSection = section;
+          }
+        });
+
+        if (bestSection) {
+          setActiveLink(bestSection.id);
+        }
+      };
+
+      if (navLinks.length && observedSections.length) {
+        window.addEventListener("scroll", syncNavWithScroll, { passive: true });
+        window.addEventListener("resize", syncNavWithScroll);
+        syncNavWithScroll();
+
+        navLinks.forEach((link) => {
+          link.addEventListener("pointermove", (event) => {
+            const rect = link.getBoundingClientRect();
+            const x = ((event.clientX - rect.left) / rect.width) * 100;
+            const y = ((event.clientY - rect.top) / rect.height) * 100;
+            link.style.setProperty("--hover-x", `${x}%`);
+            link.style.setProperty("--hover-y", `${y}%`);
+          });
+
+          link.addEventListener("mouseleave", () => {
+            link.style.removeProperty("--hover-x");
+            link.style.removeProperty("--hover-y");
+          });
+
+          link.addEventListener("click", (event) => {
+            const targetId = link.getAttribute("href");
+            const targetSection = targetId
+              ? document.querySelector(targetId)
+              : null;
+
+            if (targetSection) {
+              event.preventDefault();
+              const top =
+                targetSection.getBoundingClientRect().top +
+                window.scrollY -
+                20;
+              window.scrollTo({
+                top,
+                behavior: prefersReducedMotion ? "auto" : "smooth",
+              });
+            }
+
+            lockHighlight(prefersReducedMotion ? 0 : 1100);
+            setActiveLink(link.getAttribute("href").replace("#", ""));
+          });
+        });
+      }
+
+      // Clipboard copy with feedback
+      const copyButtons = document.querySelectorAll(".copy-btn");
+      copyButtons.forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const text = btn.dataset.formula;
+          try {
+            await navigator.clipboard.writeText(text);
+            btn.dataset.copied = true;
+            setTimeout(() => (btn.dataset.copied = false), 1200);
+          } catch (e) {
+            btn.dataset.tooltip = "Copy not available";
+            btn.dataset.copied = true;
+            setTimeout(() => {
+              btn.dataset.copied = false;
+              btn.dataset.tooltip = "Copied!";
+            }, 1400);
+          }
+        });
+      });
+
+      // Path switching between Excel and Sheets content
+      const pathButtons = document.querySelectorAll(".path-btn");
+      const panels = document.querySelectorAll(".path-panel");
+
+      pathButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const target = button.dataset.target;
+          pathButtons.forEach((b) =>
+            b.classList.toggle("active", b === button)
+          );
+          panels.forEach((panel) => {
+            const isActive = panel.dataset.panel === target;
+            panel.classList.toggle("active", isActive);
+          });
+          // reset heights so animations are accurate
+          refreshLessons();
+        });
+      });
+
+      // Collapsible lessons with smooth height animation
+      const lessons = document.querySelectorAll(".lesson");
+
+      function setHeight(lesson) {
+        const content = lesson.querySelector(".lesson-content");
+        if (lesson.classList.contains("active")) {
+          content.style.maxHeight = content.scrollHeight + "px";
+        } else {
+          content.style.maxHeight = 0;
+        }
+      }
+
+      function refreshLessons() {
+        lessons.forEach(setHeight);
+      }
+
+      lessons.forEach((lesson) => {
+        const header = lesson.querySelector(".lesson-header");
+        header.addEventListener("click", () => {
+          lesson.classList.toggle("active");
+          setHeight(lesson);
+        });
+      });
+
+      // Initialize heights
+      refreshLessons();
+    </script>
+  </body>
+</html>
