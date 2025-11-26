@@ -843,9 +843,15 @@
       }
 
       .download-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        display: flex;
         gap: 18px;
+        align-items: stretch;
+        flex-wrap: wrap;
+      }
+
+      .download-grid .btn {
+        flex: 1 1 260px;
+        min-width: 260px;
       }
 
       .btn {
@@ -866,6 +872,7 @@
         transition: transform var(--transition), box-shadow var(--transition),
           filter var(--transition);
         text-decoration: none;
+        white-space: nowrap;
       }
 
       .btn:hover {
@@ -879,6 +886,16 @@
         color: var(--plum);
         border: 1px solid rgba(112, 62, 87, 0.15);
         box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+      }
+
+      .btn.canva {
+        background: linear-gradient(135deg, #00c4cc, #4361ff, #7d2ae8);
+        box-shadow: 0 16px 36px rgba(67, 97, 255, 0.32);
+      }
+
+      .btn.canva:hover {
+        box-shadow: 0 20px 42px rgba(67, 97, 255, 0.4);
+        filter: saturate(1.06);
       }
 
       /* How-to area with more visual, soft cards */
@@ -1407,8 +1424,9 @@
         <div class="card">
           <h2>Download Your Template</h2>
           <p>
-            Choose the format you love. Both options use the same calm,
-            minimalist layout.
+            Choose the format you love — every version keeps the same calm,
+            minimalist layout. We also added an editable Canva template so you
+            can match the design to your own colors and branding.
           </p>
           <div class="download-grid" style="margin-top: 16px">
             <a
@@ -1424,6 +1442,13 @@
               target="_blank"
               rel="noreferrer"
               >Download – Excel Version</a
+            >
+            <a
+              class="btn canva"
+              href="https://www.canva.com/design/DAG51KpqBy4/6oaE6j7SOtrRlT6VKxZg5w/view?utm_content=DAG51KpqBy4&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink&mode=preview"
+              target="_blank"
+              rel="noreferrer"
+              >Edit in Canva – Visual Template</a
             >
           </div>
         </div>
