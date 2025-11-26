@@ -189,6 +189,7 @@
         font-family: inherit;
         padding: 12px 14px;
         border-radius: 14px;
+        min-width: 0;
       }
 
       .gate-input-wrap input:focus {
@@ -1269,6 +1270,16 @@
         .gate-input-wrap input {
           font-size: 15px !important;
           padding: 10px 12px !important;
+        }
+      }
+
+      @media (max-width: 420px) {
+        .gate-input-wrap {
+          flex-direction: column;
+          gap: 8px;
+        }
+        .gate-input-wrap button {
+          width: 100%;
         }
       }
     </style>
