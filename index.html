@@ -882,6 +882,10 @@
         align-items: center;
         justify-content: space-between;
         gap: 10px;
+        flex-wrap: wrap;
+        word-break: break-word;
+        max-width: 100%;
+        padding-bottom: 14px;
         font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
         font-size: 14px;
         color: #3a303c;
@@ -901,6 +905,8 @@
         box-shadow: 0 10px 24px rgba(112, 62, 87, 0.18);
         position: relative;
         transition: transform var(--transition), box-shadow var(--transition);
+        flex-shrink: 0;
+        margin-top: 8px;
       }
 
       .copy-btn:hover {
